@@ -29,6 +29,8 @@ const app: Express = express()
 app.use(cors())
 const port = process.env.PORT || 3000;
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
 app.get("/texts", async (req: Request, res: Response) => {
     let texts;
 
