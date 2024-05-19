@@ -1,14 +1,15 @@
 export function createIncomingMsg(text : string) {
     let incoming_image = "/incoming.jpg"
-    let nicknames = ["My cutiepie", "Peanut", "Couscous", "Hot stuff", "Amazing gf"]
-    let nickname = nicknames[Math.floor(Math.random() * nicknames.length)]
+    if (isValidHttpUrl(text)){
+        text = `<a href="${text}" target="_blank">${text}</a>`
+    }
     return `
     <div class="chat__conversation-board__message-container">
         <div class="chat__conversation-board__message__person">
             <div class="chat__conversation-board__message__person__avatar">
                 <img src="${incoming_image}" alt="My bestest gf" />
             </div>
-            <span class="chat__conversation-board__message__person__nickname">${nickname}</span>
+            <span class="chat__conversation-board__message__person__nickname">Babe</span>
         </div>
         <div class="chat__conversation-board__message__context">
             <div class="chat__conversation-board__message__bubble"> <span>${text}</span></div>
@@ -19,6 +20,9 @@ export function createIncomingMsg(text : string) {
 
 export function createOutgoingMsg(text : string) {
     let outgoing_image = "/outgoing.jpg"
+    if (isValidHttpUrl(text)){
+        text = `<a href="${text}" target="_blank">${text}</a>`
+    }
     return `
     <div class="chat__conversation-board__message-container reversed">
         <div class="chat__conversation-board__message__person">
@@ -34,6 +38,17 @@ export function createOutgoingMsg(text : string) {
         </div>
     </div>
     `
+}
+
+function isValidHttpUrl(text: string) {
+    let url;
+    try {
+      url = new URL(text);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
 }
 
 export function getTextBar(){

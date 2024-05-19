@@ -11,8 +11,8 @@ interface Text {
     order : number
 }
 
-export async function getTexts(cursor? : string, take : number = 10) {
-    let request_url = cursor ? `${API_URL}/texts?cursor=${cursor}&take=${take}` : `${API_URL}/texts?take=${take}`
+export async function getTexts() {
+    let request_url = `${API_URL}/texts`
     try{
         let response = await axios.get(request_url)
         if(response.status == 200){
