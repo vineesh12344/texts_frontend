@@ -9,11 +9,12 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model all_texts {
-  date      DateTime @db.Timestamp(6)
-  text_body String   @db.VarChar
-  person    String   @db.VarChar
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  order     BigInt?
+  date        DateTime     @db.Timestamp(6)
+  text_body   String       @db.VarChar
+  person      String       @db.VarChar
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order       BigInt?
+  today_chunk today_chunk?
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -30,4 +31,12 @@ model all_texts_duplicate {
 model test {
   uid String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id  String?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model today_chunk {
+  text_id   String    @id @db.Uuid
+  take      BigInt?   @default(10)
+  date      DateTime  @db.Timestamptz(6)
+  all_texts all_texts @relation(fields: [text_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

@@ -30,40 +30,43 @@ app.use(cors())
 const port = process.env.PORT || 3000;
 
 app.get("/texts", async (req: Request, res: Response) => {
-    let take = Number(req.query.take) || 10
     let texts;
-    if (req.query.cursor === undefined) {
-        texts = await prisma.all_texts.findMany({
-            take: take,
-            skip: 1,
-            orderBy: {
-                order: 'asc'
-            }
-        })
-    } else {
-        let cursor;
-        try {
-            cursor = String(req.query.cursor)
-        } catch {
-            return res.status(400).json({ error: 'Invalid cursor' })
+
+    let dayChunks = await prisma.today_chunk.findMany({
+        take: 1,
+        orderBy: {
+            date: 'desc'
         }
-        texts = await prisma.all_texts.findMany({
-            take: take,
-            skip: 1,
-            cursor : {
-                id : cursor
-            },
-            orderBy: {
-                order: 'asc'
-            }
-        })
-    }
-    let processed_texts = texts.map((text) => ({
+    })
+    let take = parseInt(dayChunks[0].take?.toString() ?? '15')
+    let cursor = dayChunks[0].text_id
+    texts = await prisma.all_texts.findMany({
+        take: take,
+        skip: 1,
+        cursor: {
+            id: cursor
+        },
+        orderBy: {
+            order: 'asc'
+        }
+    })
+    let processed_texts = await Promise.all(texts.map(async (text) => ({
         ...text,
+        text_body : await handleJson(text.text_body),
         order: text.order?.toString() ?? ''
-    }))
+    })))
     return res.status(200).json(processed_texts)
 })
+
+async function handleJson(text_body : string) {
+    let parsedText;
+    try {
+        parsedText = JSON.parse(text_body);
+    } catch (e) {
+        return text_body;
+    }
+    return parsedText[0]["text"];
+}
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
