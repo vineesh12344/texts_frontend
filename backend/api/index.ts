@@ -70,6 +70,4 @@ async function handleJson(text_body : string) {
     return parsedText[0]["text"];
 }
 
-app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+app.listen(3001, () => console.log('Server ready on port 3001.'));
