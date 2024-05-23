@@ -4,19 +4,20 @@ import { createIncomingMsg, createOutgoingMsg, getTextBar} from './components.ts
 import { getTexts } from './db.ts'
 
 
-async function main() {
-    const texts = await getTexts();
-    return `
-    <div class="--dark-theme" id="chat">
-        <div class="chat__conversation-board">
-            ${texts.map(text => text.person != "Vineesh Nimmagadda" ? createIncomingMsg(text.text_body) : createOutgoingMsg(text.text_body)).join('')}
+function main() {
+    getTexts().then(texts => {
+        document.querySelector<HTMLDivElement>('#app')!.innerHTML =  `
+        <div class="--dark-theme" id="chat">
+            <div class="chat__conversation-board">
+                ${texts.map(text => text.person != "Vineesh Nimmagadda" ? createIncomingMsg(text.text_body) : createOutgoingMsg(text.text_body)).join('')}
+            </div>
+            ${getTextBar()}
         </div>
-        ${getTextBar()}
-    </div>
-    `
+        `;
+    });
 }
-console.log(await main())
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = await main()
+
+main()
 
 // document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 // <div class="--dark-theme" id="chat">

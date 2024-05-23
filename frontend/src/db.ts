@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { UUID } from 'crypto';
 
-let API_URL = "http://localhost:3000"
+let API_URL = import.meta.env.VITE_SERVER_URL
 
 interface Text {
     date : Date,
