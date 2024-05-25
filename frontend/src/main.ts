@@ -4,6 +4,7 @@ import { getTexts, login } from './db.ts'
 
 
 function main() {
+    console.log('main')
     if( localStorage.getItem('loggedIn') === null) {
         document.querySelector<HTMLDivElement>('#app')!.innerHTML = loginComponent();
         document.querySelector<HTMLFormElement>('form')!.addEventListener('submit', (e) => {
@@ -14,7 +15,7 @@ function main() {
             login(username, password).then(token => {
                 localStorage.setItem('loggedIn', 'true')
                 localStorage.setItem('token', token)
-                main();
+                location.reload();
             }).catch(() => {
                 alert('Invalid username or password');
             })
