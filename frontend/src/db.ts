@@ -11,6 +11,25 @@ interface Text {
     order : number
 }
 
+axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`
+
+export async function login(username : string, password : string) {
+    let request_url = `${API_URL}/login`
+    try{
+        let response = await axios.post(request_url, {username, password})
+        if(response.status == 200){
+            let token = response.data.token
+            return token
+        }else{
+            console.error(response.status, response.statusText)
+            throw new Error("Failed to login")
+        }
+    }catch (error) {
+        console.error(error)
+        throw new Error("Failed to login")
+    }
+}
+
 export async function getTexts() {
     let request_url = `${API_URL}/texts`
     try{

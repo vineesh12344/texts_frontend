@@ -86,3 +86,20 @@ export function getTextBar(){
     </div>
     `
 }
+
+export function loginComponent(){
+    let loginImage = "/login_photo.jpg"
+    return `
+    <div class="login-dark">
+        <form method="post">
+            <h2 class="sr-only">Login Form</h2>
+            <div class="illustration"><img src="${loginImage}" alt="Thomas Rogh" /></div>
+            <div class="form-group"><input class="form-control" id="username" type="username" name="username" placeholder="Username"></div>
+            <div class="form-group"><input class="form-control" id="password" type="password" name="password" placeholder="Password"></div>
+            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+    `
+}
