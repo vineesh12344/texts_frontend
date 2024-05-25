@@ -1,7 +1,12 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-import express, { Express, Request, Response } from 'express'
-import cors from 'cors'
+import { Prisma, PrismaClient } from '@prisma/client';
+import express, { Express, NextFunction, Request, Response } from 'express';
+import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+
+interface AuthenticatedRequest extends Request {
+    decodedToken?: any;
+}
 
 const prisma = new PrismaClient()
 prisma.$use(async (params: Prisma.MiddlewareParams, next: (params: Prisma.MiddlewareParams) => Promise<any>) => {
@@ -25,13 +30,39 @@ prisma.$use(async (params: Prisma.MiddlewareParams, next: (params: Prisma.Middle
     return await next(params);
 });
 
+const JWT_SECRET = process.env.JWT_SECRET
+
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET not set')
+}
+
+var login = async (req: AuthenticatedRequest, res: Response, next : NextFunction) => {
+    console.log('Login middleware')
+    const authHeader = req.headers.authorization;
+    if (authHeader === null || authHeader === undefined || !authHeader.startsWith("Bearer ")) {
+        console.log("Wrong format")
+        res.status(401).send();
+        return;
+    }
+    const token = authHeader.replace("Bearer ", "");
+    jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] }, (error, decodedToken) => {
+        if (error) {
+            console.log("Decoding failed")
+            res.status(401).send();
+            return;
+        }
+        req.decodedToken = decodedToken;
+        next();
+    });
+};
+
 const app: Express = express()
 app.use(cors())
-const port = process.env.PORT || 3000;
+app.use(express.json())
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
-app.get("/texts", async (req: Request, res: Response) => {
+app.get("/texts",login, async (req: Request, res: Response) => {
     console.log('Request received')
     res.setHeader('Access-Control-Allow-Credentials', "true")
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -68,6 +99,28 @@ app.get("/texts", async (req: Request, res: Response) => {
         order: text.order?.toString() ?? ''
     })))
     return res.status(200).json(processed_texts)
+})
+
+app.post("/login", async (req: Request, res: Response) => {
+    let { username, password } = req.body;
+    let user = await prisma.users.findUnique({
+        where: {
+            username: username,
+            password: password
+        }
+    })
+
+    if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" })
+    }
+
+    const payload = { username: user.username, id: user.id }
+    jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+        if (err) {
+            return res.status(500).json({ message: "Internal server error" })
+        }
+        return res.status(200).json({ token })
+    })
 })
 
 async function handleJson(text_body : string) {
