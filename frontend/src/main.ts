@@ -5,6 +5,10 @@ import { getTexts, login } from './db.ts'
 
 function main() {
     console.log('main')
+    if (localStorage.getItem('manualReload') === 'true') {
+        localStorage.clear(); // Clear the local storage if it's a manual reload
+        localStorage.removeItem('manualReload'); // Remove the flag
+    }
     if( localStorage.getItem('loggedIn') === null) {
         document.querySelector<HTMLDivElement>('#app')!.innerHTML = loginComponent();
         document.querySelector<HTMLFormElement>('form')!.addEventListener('submit', (e) => {
@@ -21,6 +25,7 @@ function main() {
             })
         });
     }else{
+        localStorage.setItem('manualReload', 'true'); // Set the flag for manual reload
         getTexts().then(texts => {
             document.querySelector<HTMLDivElement>('#app')!.innerHTML =  `
             <div class="--dark-theme" id="chat">
