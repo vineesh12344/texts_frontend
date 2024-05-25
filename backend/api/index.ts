@@ -36,6 +36,7 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET not set')
 }
 
+
 var login = async (req: AuthenticatedRequest, res: Response, next : NextFunction) => {
     console.log('Login middleware')
     const authHeader = req.headers.authorization;
